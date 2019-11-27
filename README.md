@@ -26,16 +26,13 @@ kubectl apply -f grafana.yaml
 kubectl get pod -n cloudplus
 ```      
 ## 访问
-```bash
-# visit prometheus
+visit prometheus   
 http://localhost:31001
 
-# enter the project directory
+visit grafana   
 http://localhost:31000
 
-# config grafana
-[official document](https://grafana.com/docs/guides/getting_started/)
+config grafana  
+[official documention](https://grafana.com/docs/guides/getting_started/)
 
 (配置dashboard使用根目录下的Cluster Monitoring.json)
-
-```
