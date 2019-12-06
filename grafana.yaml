@@ -20,7 +20,7 @@ spec:
       nodeSelector:
         type: monitor
       containers:
-      - image: grafana/grafana:5.0.0
+      - image: grafana/grafana:5.4.3
         name: grafana-core
         imagePullPolicy: IfNotPresent
         resources:
