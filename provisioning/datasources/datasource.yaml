@@ -1,0 +1,25 @@
+apiVersion: 1
+deleteDatasources:
+ - name: prometheus
+   orgId: 1
+datasources:
+ - id: 17
+   orgId: 1
+   name: prometheus
+   type: prometheus
+   typeLogoUrl: ''
+   access: direct
+   url: http://133.133.135.35:31001
+   password: ''
+   user: ''
+   database: ''
+   basicAuth: false
+   basicAuthUser: ''
+   basicAuthPassword: ''
+   withCredentials: false
+   isDefault: false
+   jsonData:
+     keepCookies: []
+   secureJsonFields: {}
+   version: 1
+   readOnly: false

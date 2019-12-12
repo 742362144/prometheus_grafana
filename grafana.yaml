@@ -51,7 +51,7 @@ spec:
       volumes:
         - name: datasource-data        
           hostPath:
-             path: /root/provisioning  
+             path: /root/prometheus_grafana/provisioning  
         - name: conf-volume
           configMap:
              name: conf-config
