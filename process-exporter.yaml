@@ -1,0 +1,133 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: process-exporter
+  namespace: cloudplus
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: process-exporter
+rules:
+- apiGroups:
+  - authentication.k8s.io
+  resources:
+  - tokenreviews
+  verbs:
+  - create
+- apiGroups:
+  - authorization.k8s.io
+  resources:
+  - subjectacce***eviews
+  verbs:
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: process-exporter
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: process-exporter
+subjects:
+- kind: ServiceAccount
+  name: process-exporter
+  namespace: cloudplus
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: 'true'
+  labels:
+    k8s-app: process-exporter
+  name: process-exporter
+  namespace: cloudplus
+spec:
+  type: NodePort
+  ports:
+  - port: 9256
+    nodePort: 31002 
+  selector:
+    app: process-exporter
+---
+apiVersion: v1
+data:
+  process-exporter-configmap.yaml: |
+    process_names:
+      - name: "{{.Comm}}"
+        cmdline:
+        - '.+'
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: process-config
+  namespace: cloudplus
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    k8s-app: process-exporter
+  name: process-exporter
+  namespace: cloudplus
+spec:
+  endpoints:
+  - interval: 30s
+    port: http
+    scheme: http
+  jobLabel: k8s-app
+  selector:
+    matchLabels:
+      k8s-app: process-exporter
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app: process-exporter
+  name: process-exporter
+  namespace: cloudplus
+spec:
+  selector:
+    matchLabels:
+      app: process-exporter
+  template:
+    metadata:
+      labels:
+        app: process-exporter  
+    spec:
+      hostNetwork: true
+      hostPID: true
+      containers:
+      - image: juestnow/process-exporter:v0.5.0
+        args:
+        - "-procfs=/host/proc"
+        - "-config.path=/etc/process-exporter/process-exporter-configmap.yaml"
+        name: process-exporter
+        ports:
+        - name: http
+          #^ must be an IANA_SVC_NAME (at most 15 characters, ..)
+          containerPort: 9256
+          hostPort: 9256
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/process-exporter
+        - name: proc
+          readOnly:  true
+          mountPath: /host/proc
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: process-exporter
+      tolerations:
+      - effect: NoSchedule
+        operator: Exists
+      volumes:
+        - name: proc
+          hostPath:
+            path: /proc
+        - name: config-volume
+          configMap:
+            name: process-config

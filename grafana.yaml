@@ -35,8 +35,6 @@ spec:
             value: "false"
           - name: GF_AUTH_ANONYMOUS_ENABLED
             value: "true"
-          - name: GF_PROVISIONING
-            value: "/provisioning"
           - name: GF_AUTH_ANONYMOUS_ORG_ROLE
             value: Admin
         readinessProbe:
@@ -44,14 +42,14 @@ spec:
             path: /login
             port: 3000
         volumeMounts:
-        - mountPath: /provisioning
+        - mountPath: /etc/grafana/provisioning
           name: datasource-data
         - mountPath: /etc/grafana/ 
           name: conf-volume
       volumes:
         - name: datasource-data        
           hostPath:
-             path: /root/prometheus_grafana/provisioning  
+             path: /etc/grafana/provisioning  
         - name: conf-volume
           configMap:
              name: conf-config
