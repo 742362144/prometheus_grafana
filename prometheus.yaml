@@ -514,8 +514,11 @@ spec:
       labels:
         app: prometheus
     spec:
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
       nodeSelector:
-        type: monitor
+        node-role.kubernetes.io/master: ""
       serviceAccountName: prometheus
       securityContext:
         runAsUser: 65534

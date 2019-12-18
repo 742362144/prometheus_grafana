@@ -17,8 +17,11 @@ spec:
         app: grafana
         component: core
     spec:
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          effect: NoSchedule
       nodeSelector:
-        type: monitor
+        node-role.kubernetes.io/master: ""
       containers:
       - image: grafana/grafana:5.4.3
         name: grafana-core
